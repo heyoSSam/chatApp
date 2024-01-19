@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>liveChat</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <link rel="stylesheet" href="/css/styleUser.css">
+</head>
+
+<body>
+    <div class="wrapper">
+        <h1 class="mt-1">liveChat</h1>
+
+        <hr>
+
+        <div class="messages" id="messages">
+            
+        </div>
+
+        <input type="text" class="form-control mb-1" id="inputMessage" placeholder="Enter your message"
+            style="width:40%">
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+        integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"
+        integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+"
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.4/socket.io.js"
+        integrity="sha512-tE1z+95+lMCGwy+9PnKgUSIeHhvioC9lMlI7rLWU0Ps3XTdjRygLcy4mLuL0JAoK4TLdQEyP0yOl/9dMOqpH/Q=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script>
+        let inputMessage = document.getElementById("inputMessage");
+        let otherMessageContainer = document.getElementById("otherMessageContainer");
+        let ownMessages = document.getElementById("printOwnMessages");
+        let messages = document.getElementById("messages");
+        let socket = io.connect("http://localhost:3000");
+        let message = '',
+            userName = '';
+        
+        socket.on('get', data => {
+            userName = data;
+        })
+
+        inputMessage.addEventListener("keypress", (e) => {
+            if(e.key == 'Enter'){
+                e.preventDefault();
+                if (inputMessage.value) {
+                    message = {
+                        name: userName,
+                        content: inputMessage.value
+                    }
+                    socket.emit('chat', message);
+                    let divMessage = document.createElement('div');
+                    divMessage.classList.add('printOwnMessages');
+                    divMessage.innerHTML += `<div class="ownMessages" id="ownMessageContainer">
+                            <h3>${message.name}</h3>
+                            <div class="messageContent">
+                                <p>${message.content}</p>
+                            </div>
+                        </div>`;
+
+                    messages.appendChild(divMessage);
+                    inputMessage.value = '';
+                }
+            }
+        });
+
+        socket.on('chat receive', (msg) => {
+            messages.innerHTML += `<div class="otherMessages" id="otherMessageContainer">
+                    <h3>${msg.name}</h3>
+                    <div class="messageContent">
+                        <p>${msg.content}</p>
+                    </div>
+                </div`;
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,26 @@
+.wrapper{
+    margin: 0 auto;
+    width:40%;
+}
+
+#inputMessage{
+    position:fixed;
+    bottom: 0;
+}
+
+h3{
+    font-size:16px
+}
+
+.messages{
+    font-size:12px;
+}
+
+.printOwnMessages{
+    display:flex;
+    justify-content: flex-end;
+}
+
+.otherMessages{
+    width:100%
+}
